@@ -56,7 +56,7 @@ public class Main {
         provider.initialize(); // load flags from file
         FeatureFlags.setProvider(provider); // register provider globally
 
-        boolean isFeatureEnabled = FeatureFlags.get("newFeature").asBoolean();
+        boolean isFeatureEnabled = provider.get("newFeature").asBoolean();
         System.out.println("Is 'newFeature' enabled? " + isFeatureEnabled);
     }
 }
@@ -79,7 +79,7 @@ public class Main {
 ### Accessing Nested Flags
 
 ```java
-Map<String, FlagValue> children = FeatureFlags.getChildren("nested");
+Map<String, FlagValue> children = provider.getChildren("nested");
 String sub = children.get("subFeature").asString(); // returns "beta"
 ```
 
@@ -90,7 +90,7 @@ String sub = children.get("subFeature").asString(); // returns "beta"
 If your provider supports it:
 
 ```java
-FeatureFlags.refresh(); // Reloads flags via current provider
+provider.refresh(); // Reloads flags via current provider
 ```
 
 For `JsonFileProvider`, this will reload from the source file if `loadFlags()` is implemented accordingly.
@@ -102,7 +102,7 @@ For `JsonFileProvider`, this will reload from the source file if `loadFlags()` i
 If your provider is observable:
 
 ```java
-FeatureFlags.addGlobalChangeListener((key, value) -> {
+provider.addGlobalChangeListener((key, value) -> {
     System.out.printf("Flag changed: %s -> %s%n", key, value);
 });
 ```
@@ -114,7 +114,7 @@ FeatureFlags.addGlobalChangeListener((key, value) -> {
 Gracefully release resources (e.g., threads):
 
 ```java
-FeatureFlags.shutdown();
+provider.shutdown();
 ```
 
 ---
@@ -134,6 +134,6 @@ To integrate with another config system (e.g., Consul, etcd, DB):
 If a flag is missing, it returns a "null value" (safe defaults):
 
 ```java
-boolean enabled = FeatureFlags.get("unknown").asBoolean(); // false
-String name = FeatureFlags.get("missing").asString();       // ""
+boolean enabled = provider.get("unknown").asBoolean(); // false
+String name = provider.get("missing").asString();       // ""
 ```
